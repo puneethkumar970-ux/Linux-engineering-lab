@@ -1,36 +1,52 @@
 #!/bin/bash
 
-LOG_FILE="/var/log/auth.log"
-LOG_FILE2="/var/log/syslog"
+LOG_FILE="${1:-/var/log/auth.log}"
+LOG_FILE2="${2:-/var/log/syslog}"
 echo ""
 echo "========================="
 echo "   LINUX LOG ANALYZER"
 echo "========================="
 
-#check if the log file exists
+# Validate authentication log
 if [ ! -f "$LOG_FILE" ]; then
-    echo "ERROR: Log file not found"
+    echo "ERROR: Authentication log not found: $LOG_FILE"
+    exit 1
+fi
+
+if [ ! -r "$LOG_FILE" ]; then
+    echo "ERROR: Authentication log is not readable: $LOG_FILE"
+    exit 1
+fi
+
+# Validate system log
+if [ ! -f "$LOG_FILE2" ]; then
+    echo "ERROR: System log not found: $LOG_FILE2"
+    exit 1
+fi
+
+if [ ! -r "$LOG_FILE2" ]; then
+    echo "ERROR: System log is not readable: $LOG_FILE2"
     exit 1
 fi
 
 
 #Count failed login attempts
-FAILED_LOGINS=$( sudo grep -ci "Failed password" "$LOG_FILE")
+FAILED_LOGINS=$(grep -ci "Failed password" "$LOG_FILE")
 
-#Count sucessful logins
-SUCESSFUL_LOGINS=$( sudo grep -ci "Accepted" "$LOG_FILE")
+#Count Successful Logins
+SUCCESSFUL_LOGINS=$(grep -ci "Accepted" "$LOG_FILE")
 
 #count invalid user login attempts
-INVALID_USERS=$( sudo grep -ci "Invalid user" "$LOG_FILE")
+INVALID_USERS=$(grep -ci "Invalid user" "$LOG_FILE")
 
-ERROR_COUNT=$( sudo grep -ci "error" "$LOG_FILE2")
-WARNING_COUNT=$( sudo grep -ci "warning" "$LOG_FILE2")
-INFO_COUNT=$( sudo grep -ci "info" "$LOG_FILE2")
-echo""
+ERROR_COUNT=$(grep -ci "error" "$LOG_FILE2")
+WARNING_COUNT=$(grep -ci "warning" "$LOG_FILE2")
+INFO_COUNT=$(grep -ci "info" "$LOG_FILE2")
+echo ""
 echo "Failed Login Attempts: $FAILED_LOGINS"
-echo "Sucessful Logins: $SUCESSFUL_LOGINS"
-echo "Invaild User Attempts: $INVALID_USERS"
-echo "Erros: $ERROR_COUNT"
+echo "Successful Logins: $SUCCESSFUL_LOGINS"
+echo "Invalid User Attempts: $INVALID_USERS"
+echo "Errors: $ERROR_COUNT"
 echo "Warnings: $WARNING_COUNT"
 echo "Info: $INFO_COUNT"
 
@@ -63,7 +79,7 @@ fi
 
 echo ""
 echo "==================="
-echo "   ERROR DETILS"
+echo "   ERROR DETAILS"
 echo "==================="
 
 if [ "$ERROR_COUNT" -gt 0 ]; then

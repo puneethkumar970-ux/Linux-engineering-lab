@@ -1,0 +1,6 @@
+Nov 02 10:20:21 server systemd[1]: ERROR: Database service failed
+Nov 02 10:21:21 server kernel: WARNING: High memory usage detected
+Nov 02 10:22:21 server systemd[1]: INFO: Network service started
+Nov 02 10:23:21 server systemd[1]: ERROR: Disk operation failed
+Nov 02 10:24:21 server kernel: WARNING: CPU usage is high
+Nov 02 10:25:21 server systemd[1]: INFO: Backup completed
